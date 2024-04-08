@@ -1,5 +1,6 @@
 package stepDefs;
 
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -13,27 +14,33 @@ public class postcodeApiStepDefs extends BaseSteps {
 
     @Given("service is up and running")
     public void service_is_up_and_running() {
-        setApplicationJsonHeader();
         setEndpointPath(ServiceUrl);
         responseForServiceCall = getCall();
         assertThat(responseForServiceCall.statusCode(), equalTo(200));
     }
 
-    @When("I send GET request for a {string} in the {string}")
-    @When("I send GET request for an invalid {string} in the {string}")
-    public void iSendGETRequestForAInThe(String pCode, String cAbbreviation) {
-        setApplicationJsonHeader();
-        if (cAbbreviation.equalsIgnoreCase( "GB")) {
+    @When("I make a GET request to the API endpoint with an invalid postcode or Zip code information using {string} and {string}")
+    @When("I make a GET request to the API endpoint for postcode information using valid postcode as {string} and {string}")
+    @When("I make a GET request to the API endpoint for zip code information using valid zip code as {string} and {string}")
+    public void iMakeAGETRequestToTheAPIEndpointForPostcodeInformationUsingValidZipCodeAsAnd(String pCode, String cAbbreviation) {
+        if (cAbbreviation.equalsIgnoreCase("GB")) {
             setEndpointPath(postCodeUrl_GB + pCode);
         } else {
             setEndpointPath(postCodeUrl_US + pCode);
         }
         responseForGetAPostCodeCall = getCall();
+
     }
 
-    @Then("the following details {string}, {string}, {string}, {string}, {string}, {string}, {string} and {string} for the post code are returned in the response body with status code of {int}")
-    public void theFollowingDetailsAndForThePostCodeAreReturnedInTheResponseBodyWithStatusCodeOf(String pCode, String country, String cAbbreviation, String pName, String longitude, String state, String sAbbreviation, String latitude, Integer sCode) {
+    @Then("the response status code should be {int} Not Found")
+    @Then("the response status code should be {int} OK")
+    public void theResponseStatusCodeShouldBeOK(int sCode) {
         assertThat(responseForGetAPostCodeCall.statusCode(), equalTo(sCode));
+    }
+
+    @And("the response body should contain the correct details for the provided Zip code as {string}, {string}, {string}, {string}, {string}, {string}, {string} and {string}")
+    @And("the response body should contain the correct details for the provided postcode as {string}, {string}, {string}, {string}, {string}, {string}, {string} and {string}")
+    public void theResponseBodyShouldContainTheCorrectDetailsForTheProvidedPostcodeAsAnd(String pCode, String country, String cAbbreviation, String pName, String longitude, String state, String sAbbreviation, String latitude) {
         assertThat(responseForGetAPostCodeCall.body().jsonPath().get("'post code'"), equalTo(pCode));
         assertThat(responseForGetAPostCodeCall.body().jsonPath().get("country"), equalTo(country));
         assertThat(responseForGetAPostCodeCall.body().jsonPath().get("'country abbreviation'"), equalTo(cAbbreviation));
@@ -45,8 +52,4 @@ public class postcodeApiStepDefs extends BaseSteps {
 
     }
 
-    @Then("{int} Not found error status code is returned")
-    public void notFoundErrorStatusCodeIsReturned(int sCode) {
-        assertThat(responseForGetAPostCodeCall.statusCode(), equalTo(sCode));
-    }
 }
