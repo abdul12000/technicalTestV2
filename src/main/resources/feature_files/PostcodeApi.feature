@@ -11,6 +11,7 @@ Feature: PostcodeApi - Retrieve Postcode Or Zip code Information
     Examples:
       | zipcode | country       | countryAbrreviation | placeName     | longitude | state      | stateAbbreviation | latitude |
       | 90210   | United States | US                  | Beverly Hills | -118.4065 | California | CA                | 34.0901  |
+      | 10001   | United States | US                  | New York City | -73.9967  | New York   | NY                | 40.7484  |
 
   Scenario Outline: Retrieve Postcode Information for a Valid GB postcode
     When I make a GET request to the API endpoint for postcode information using valid postcode as "<postcode>" and "<countryAbrreviation>"
